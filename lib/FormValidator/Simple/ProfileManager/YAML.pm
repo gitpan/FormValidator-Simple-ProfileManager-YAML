@@ -2,7 +2,7 @@ package FormValidator::Simple::ProfileManager::YAML;
 use strict;
 
 use vars qw($VERSION);
-$VERSION = '0.02';
+$VERSION = '0.03';
 
 sub new {
     my $class = shift;
@@ -12,8 +12,8 @@ sub new {
 }
 
 sub init {
-    my ($self, $options) = @_;
-    my $yaml = $options->{profile};
+    my ($self, $yaml, $options) = @_;
+    $options ||= {};
     my $loader = $options->{loader} || 'YAML';
     if ( $loader eq 'YAML::Syck') {
         require YAML::Syck;
@@ -24,7 +24,6 @@ sub init {
     } else {
         die "Don't know loader $loader";
     }
-
 }
 
 sub get_profile {
@@ -42,6 +41,7 @@ sub _get_profile_recursive {
     }
 }
 
+
 1;
 __END__
 
@@ -54,9 +54,7 @@ FormValidator::Simple::ProfileManager::YAML - YAML profile manager for FormValid
   use FormValidator::Simple;
   use FormValidator::Simple::ProfileManager::YAML;
 
-  my $manager = FormValidator::Simple::ProfileManager::YAML->new(
-    profile => '/path/to/profile.yml',
-  );
+  my $manager = FormValidator::Simple::ProfileManager::YAML->new('/path/to/profile.yml');
 
   my $profile = $manager->get_profile(@groups);
 
@@ -66,8 +64,10 @@ FormValidator::Simple::ProfileManager::YAML - YAML profile manager for FormValid
   # Default YAML loader is 'YAML'.
   # If you want to use 'YAML::Syck' as loader, pass 'loader' to constructor as below.
   my $manager = FormValidator::Simple::ProfileManager::YAML->new(
-    profile     => '/path/to/profile.yml',
-    loader =>'YAML::Syck',
+      '/path/to/profile.yml',
+      {
+          loader => 'YAML::Syck',
+      }
   );
 
   # sample yaml profile
