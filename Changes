@@ -1,4 +1,7 @@
 Revision history for Perl extension FormValidator::Simple::ProfileManager::YAML
 
+0.02  Fri Mar 10 13:42:11 2006
+    - fix bug.
+
 0.01  Fri Mar 10 11:31:37 2006
 	- original version

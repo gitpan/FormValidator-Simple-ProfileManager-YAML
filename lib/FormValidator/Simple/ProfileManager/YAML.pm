@@ -2,7 +2,7 @@ package FormValidator::Simple::ProfileManager::YAML;
 use strict;
 
 use vars qw($VERSION);
-$VERSION = '0.01';
+$VERSION = '0.02';
 
 sub new {
     my $class = shift;
@@ -36,7 +36,7 @@ sub _get_profile_recursive {
     my ($self, $profile, @paths) = @_;
     if ( @paths ) {
         $profile = $profile->{shift @paths};
-        return $profile ? $self->_get_profile($profile, @paths) : undef;
+        return $profile ? $self->_get_profile_recursive($profile, @paths) : undef;
     } else {
         return $profile;
     }
