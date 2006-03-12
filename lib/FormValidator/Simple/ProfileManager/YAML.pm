@@ -2,7 +2,7 @@ package FormValidator::Simple::ProfileManager::YAML;
 use strict;
 
 use vars qw($VERSION);
-$VERSION = '0.04';
+$VERSION = '0.05';
 
 sub new {
     my $class = shift;
@@ -30,6 +30,7 @@ sub extract {
     my $self = shift;
     my $self_new = bless { %$self }, ref $self;
     $self_new->{_profile} = $self_new->get_profile(@_);
+    return unless $self_new->{_profile};
     return $self_new;
 }
 

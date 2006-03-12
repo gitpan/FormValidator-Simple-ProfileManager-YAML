@@ -1,4 +1,7 @@
 Revision history for Perl extension FormValidator::Simple::ProfileManager::YAML
+0.05  Sun Mar 12 20:27:46 2006
+   -  Modify method extract. Return undef if passed group doesn't exist.
+
 0.04  Sun Mar 12 17:16:42 2006
    -  Add method extract.
    -  Add method add_profile.

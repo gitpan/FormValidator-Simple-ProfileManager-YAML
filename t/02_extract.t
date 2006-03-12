@@ -21,3 +21,7 @@ for (@Test) {
     is_deeply( $manager1->get_profile, $manager->get_profile(@group) );
 }
 
+my $manager2 = FormValidator::Simple::ProfileManager::YAML->new('t/test.yml');
+
+my $manager3 = $manager2->extract('not','exist','group');
+is ($manager3, undef);
