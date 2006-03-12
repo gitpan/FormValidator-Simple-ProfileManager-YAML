@@ -2,7 +2,7 @@ package FormValidator::Simple::ProfileManager::YAML;
 use strict;
 
 use vars qw($VERSION);
-$VERSION = '0.03';
+$VERSION = '0.04';
 
 sub new {
     my $class = shift;
@@ -22,8 +22,15 @@ sub init {
         require YAML;
         $self->{_profile} = YAML::LoadFile($yaml);
     } else {
-        die "Don't know loader $loader";
+        die "Don't know loader $loader.";
     }
+}
+
+sub extract {
+    my $self = shift;
+    my $self_new = bless { %$self }, ref $self;
+    $self_new->{_profile} = $self_new->get_profile(@_);
+    return $self_new;
 }
 
 sub get_profile {
@@ -38,6 +45,60 @@ sub _get_profile_recursive {
         return $profile ? $self->_get_profile_recursive($profile, @paths) : undef;
     } else {
         return $profile;
+    }
+}
+
+sub add_profile {
+    my $self = shift;
+    my ($keys, $constraint, @paths) = @_;
+    my $prof = $self->get_profile(@paths);
+
+    my $key = $self->_get_key($keys);
+
+    # check key duplication. replace constraint if key already exists.
+    my $key_exists;
+    for (my $i=0; $i< @$prof; $i+=2) {
+        my $cur_key = $self->_get_key($prof->[$i]);
+        if ( $key eq $cur_key ) {
+            $prof->[$i+1] = $constraint;
+            $key_exists++;
+            last;
+        }
+    }
+    # push profile unless keys eixsts
+    unless ( $key_exists ) {
+        push @$prof, $keys, $constraint;
+    }
+
+}
+
+sub remove_profile {
+    my $self = shift;
+    my ($keys, @paths) = @_;
+    my $prof = $self->get_profile(@paths);
+
+    my $key = $self->_get_key($keys);
+
+    for (my $i=0; $i< @$prof; $i+=2) {
+        my $cur_key = $self->_get_key($prof->[$i]);
+        if ( $key eq $cur_key ) {
+            splice (@$prof, $i, 2);
+            last;
+        }
+    }
+
+}
+
+sub _get_key {
+    my ($self,$keys) = @_;
+    if ( my $ref = ref $keys ) {
+        if ( $ref eq 'HASH') {
+            return (keys %$keys)[0];
+        } else {
+            die "keys must be a hashref or single scalar.";
+        }
+    } else {
+        return $keys;
     }
 }
 
@@ -56,19 +117,26 @@ FormValidator::Simple::ProfileManager::YAML - YAML profile manager for FormValid
 
   my $manager = FormValidator::Simple::ProfileManager::YAML->new('/path/to/profile.yml');
 
+  # get profile assosiated with @groups
   my $profile = $manager->get_profile(@groups);
 
+  # pass obtained profile to FormValidator::Simple
   my $result = FormValidator::Simple->check($q, $profile);
 
 
-  # Default YAML loader is 'YAML'.
-  # If you want to use 'YAML::Syck' as loader, pass 'loader' to constructor as below.
-  my $manager = FormValidator::Simple::ProfileManager::YAML->new(
-      '/path/to/profile.yml',
-      {
-          loader => 'YAML::Syck',
-      }
+  # create new manager associated with group
+  my $manager2 = $manager->extract(@groups);
+
+
+  # you can add profile to @groups
+  $manager->add_profile(
+      email => [EMAIL],[NOT_BLANK],
+      @groups,
   );
+
+  # and also you can remove profile from @groups
+  $manager->remove_profile(email, @groups);
+
 
   # sample yaml profile
 
@@ -109,9 +177,52 @@ FormValidator::Simple::ProfileManager::YAML - YAML profile manager for FormValid
   $profile = $manager->get_profile( 'group2', 'subgroup2' );
 
 
+  # Default YAML loader is 'YAML'.
+  # If you want to use 'YAML::Syck' as loader, pass 'loader' to constructor as below.
+  my $manager = FormValidator::Simple::ProfileManager::YAML->new(
+      '/path/to/profile.yml',
+      {
+          loader => 'YAML::Syck',
+      }
+  );
+
+
+
 =head1 DESCRIPTION
 
 FormValidator::Simple::ProfileManager::YAML is YAML profile manager for FormValidator::Simple.
+
+=head1 METHODS
+
+=over 4
+
+=item new
+
+  $manager = FormValidator::Simple::ProfileManager::YAML->new('/path/to/profile.yml');
+  $manager = FormValidator::Simple::ProfileManager::YAML->new('/path/to/profile.yml', {loader=>'YAML::Syck'});
+
+=item get_profile
+
+  $profile = $manager->get_profile();
+  $profile = $manager->get_profile('group1');
+  $profile = $manager->get_profile('group1', 'subgroup2');
+
+=item extract
+
+  my $manager2 = $manager->extract(@group);
+
+=item add_profile
+
+  $manager->add_profile(
+      email => [EMAIL],[NOT_BLANK],
+      @groups,
+  );
+
+=item remove_profile
+
+  $manager->remove_profile(email, @groups);
+
+=back
 
 =head1 AUTHOR
 
