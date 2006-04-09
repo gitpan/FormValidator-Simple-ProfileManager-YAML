@@ -2,7 +2,7 @@ package FormValidator::Simple::ProfileManager::YAML;
 use strict;
 
 use vars qw($VERSION);
-$VERSION = '0.05';
+$VERSION = '0.06';
 
 sub new {
     my $class = shift;
@@ -36,6 +36,7 @@ sub extract {
 
 sub get_profile {
     my ($self, @paths) = @_;
+    @paths = map { split /\./ } @paths;
     return $self->_get_profile_recursive($self->{_profile}, @paths);
 }
 
@@ -176,6 +177,8 @@ FormValidator::Simple::ProfileManager::YAML - YAML profile manager for FormValid
 
   # get profile 'subgroup2'
   $profile = $manager->get_profile( 'group2', 'subgroup2' );
+  # or you can use dot syntax.
+  $profile = $manager->get_profile( 'group2.subgroup2' );
 
 
   # Default YAML loader is 'YAML'.
@@ -207,6 +210,7 @@ FormValidator::Simple::ProfileManager::YAML is YAML profile manager for FormVali
   $profile = $manager->get_profile();
   $profile = $manager->get_profile('group1');
   $profile = $manager->get_profile('group1', 'subgroup2');
+  $profile = $manager->get_profile('group1.subgroup2');
 
 =item extract
 

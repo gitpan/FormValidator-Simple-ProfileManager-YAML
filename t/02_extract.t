@@ -8,6 +8,8 @@ my @Test = (
     ['group1'],
     ['group2', 'subgroup1' ],
     ['group2', 'subgroup2' ],
+    ['group2.subgroup1' ],
+    ['group2.subgroup2' ],
 );
 
 my $manager = FormValidator::Simple::ProfileManager::YAML->new('t/test.yml');

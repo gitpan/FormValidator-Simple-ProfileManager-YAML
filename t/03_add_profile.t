@@ -7,6 +7,8 @@ use Data::Dumper;
 my @Test = (
     ['test', [['NOT_BLANK']], 'group2', 'subgroup2' ],
     ['test', [['EMAIL']], 'group2', 'subgroup2' ],
+    ['test', [['NOT_BLANK']], 'group2.subgroup2' ],
+    ['test', [['EMAIL']], 'group2.subgroup2' ],
 );
 
 my $manager = FormValidator::Simple::ProfileManager::YAML->new('t/test.yml');
